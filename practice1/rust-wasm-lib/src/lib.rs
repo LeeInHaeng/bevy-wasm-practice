@@ -17,6 +17,7 @@ pub fn run_bevy_app() {
                 ..default()
             })
         })
+        .insert_resource(Scoreboard { score: 0 })
         .add_systems(
             Startup,
             (
@@ -29,6 +30,7 @@ pub fn run_bevy_app() {
                 check_for_collisions,
                 move_paddle.before(check_for_collisions),
                 apply_velocity.before(check_for_collisions),
+                update_scoreboard
             )
         )
         .run();
@@ -58,7 +60,7 @@ const BALL_COLOR: Color = Color::rgb(1.0, 0.5, 0.5);
 struct Velocity(Vec2);
 
 const BALL_SPEED: f32 = 400.0;
-const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.0, -0.5);
+const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.1, -0.5);
 
 // wall definition
 const WALL_THICKNESS: f32 = 10.0;
@@ -108,6 +110,80 @@ fn startup_system(
         Ball,
         Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
     ));
+
+    // bricks
+    let total_width_of_bricks = (RIGHT_WALL - LEFT_WALL) - 2. * GAP_BETWEEN_BRICKS_AND_SIDES;
+    let bottom_edge_of_bricks = paddle_y + GAP_BETWEEN_PADDLE_AND_BRICKS;
+    let total_height_of_bricks = TOP_WALL - bottom_edge_of_bricks - GAP_BETWEEN_BRICKS_AND_CEILING;
+
+    let n_columns = (total_width_of_bricks / (BRICK_SIZE.x + GAP_BETWEEN_BRICKS)).floor() as usize;
+    let n_rows = (total_height_of_bricks / (BRICK_SIZE.y + GAP_BETWEEN_BRICKS)).floor() as usize;
+
+    let center_of_bricks = (LEFT_WALL + RIGHT_WALL) / 2.0;
+    let n_vertical_gaps = n_columns - 1;    
+    let left_edge_of_bricks = center_of_bricks
+        - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
+        - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
+
+    let offset_x = left_edge_of_bricks + BRICK_SIZE.x / 2.;
+    let offset_y = bottom_edge_of_bricks + BRICK_SIZE.y / 2.;
+
+    for row in 0..n_rows {
+        for column in 0..n_columns {
+            let brick_position = Vec2::new(
+                offset_x + column as f32 * (BRICK_SIZE.x + GAP_BETWEEN_BRICKS),
+                offset_y + row as f32 * (BRICK_SIZE.y + GAP_BETWEEN_BRICKS),
+            );
+
+            commands.spawn((
+                SpriteBundle {
+                    sprite: Sprite {
+                        color: BRICK_COLOR,
+                        ..default()
+                    },
+                    transform: Transform {
+                        translation: brick_position.extend(0.0),
+                        scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
+                        ..default()
+                    },
+                    ..default()
+                },
+                Brick,
+                Collider,
+            ));
+        }
+    }
+
+    // score board
+    commands.spawn(
+        TextBundle::from_sections([
+            TextSection::new(
+                "Score: ",
+                TextStyle {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: SCOREBOARD_FONT_SIZE,
+                    color: TEXT_COLOR,
+                },
+            ),
+            TextSection::from_style(TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: SCOREBOARD_FONT_SIZE,
+                color: SCORE_COLOR,
+            }),
+        ])
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: SCOREBOARD_TEXT_PADDING,
+            left: SCOREBOARD_TEXT_PADDING,
+            ..default()
+        }),
+    );
+
+    // walls
+    commands.spawn(WallBundle::new(WallLocation::Left));
+    commands.spawn(WallBundle::new(WallLocation::Right));
+    commands.spawn(WallBundle::new(WallLocation::Bottom));
+    commands.spawn(WallBundle::new(WallLocation::Top));
 }
 
 // move paddle
@@ -147,19 +223,26 @@ fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>) {
 
 
 fn check_for_collisions(
+    mut commands: Commands,
+    mut scoreboard: ResMut<Scoreboard>,
     mut ball_query: Query<(&mut Velocity, &Transform), With<Ball>>,
-    collider_query: Query<&Transform, With<Collider>>,
+    collider_query: Query<(Entity, &Transform, Option<&Brick>), With<Collider>>,
 ) {
     let (mut ball_velocity, ball_transform) = ball_query.single_mut();
     let ball_size = ball_transform.scale.truncate().x;
 
-    for transform in &collider_query {
+    for (collider_entity, transform, maybe_brick) in &collider_query {
         let collision = collide_with_side(
             BoundingCircle::new(ball_transform.translation.truncate(), ball_size / 2.),
             Aabb2d::new(transform.translation.truncate(), transform.scale.truncate()/2.),
         );
 
         if let Some(collision) = collision {
+            if maybe_brick.is_some() {
+                scoreboard.score += 1;
+                commands.entity(collider_entity).despawn();
+            }
+
             let mut reflect_x = false;
             let mut reflect_y = false;
 
@@ -208,4 +291,98 @@ fn collide_with_side(ball: BoundingCircle, wall: Aabb2d) -> Option<Collision> {
     };
 
     Some(side)
+}
+
+// Bricks definition
+#[derive(Component)]
+struct Brick;
+
+const BRICK_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
+
+const BRICK_SIZE: Vec2 = Vec2::new(100., 30.);
+
+const GAP_BETWEEN_PADDLE_AND_BRICKS: f32 = 270.0;
+const GAP_BETWEEN_BRICKS: f32 = 5.0;
+
+const GAP_BETWEEN_BRICKS_AND_CEILING: f32 = 20.0;
+const GAP_BETWEEN_BRICKS_AND_SIDES: f32 = 20.0;
+
+const TOP_WALL: f32 = 300.;
+
+// Score board definition
+#[derive(Resource)]
+struct Scoreboard {
+    score: usize,
+}
+
+const SCOREBOARD_FONT_SIZE: f32 = 40.0;
+const SCOREBOARD_TEXT_PADDING: Val = Val::Px(5.0);
+
+const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
+const SCORE_COLOR: Color = Color::rgb(1.0, 0.5, 0.5);
+
+fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text>) {
+    let mut text = query.single_mut();
+    text.sections[1].value = scoreboard.score.to_string();
+}
+
+// Wall
+enum WallLocation {
+    Left,
+    Right,
+    Bottom,
+    Top,
+}
+
+impl WallLocation {
+    fn position(&self) -> Vec2 {
+        match self {
+            WallLocation::Left => Vec2::new(LEFT_WALL, 0.),
+            WallLocation::Right => Vec2::new(RIGHT_WALL, 0.),
+            WallLocation::Bottom => Vec2::new(0., BOTTOM_WALL),
+            WallLocation::Top => Vec2::new(0., TOP_WALL),
+        }
+    }
+
+    fn size(&self) -> Vec2 {
+        let arena_height = TOP_WALL - BOTTOM_WALL;
+        let arena_width = RIGHT_WALL - LEFT_WALL;
+
+        match self {
+            WallLocation::Left | WallLocation::Right => {
+                Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
+            }
+            WallLocation::Bottom | WallLocation::Top => {
+                Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
+            }
+        }
+    }
+}
+
+#[derive(Bundle)]
+struct WallBundle {
+    sprite_bundle: SpriteBundle,
+    collider: Collider,
+}
+
+const WALL_COLOR: Color = Color::rgb(0.8, 0.8, 0.8);
+
+impl WallBundle {
+    fn new(location: WallLocation) -> WallBundle {
+        WallBundle {
+            sprite_bundle: SpriteBundle {
+                transform: Transform {
+                    translation: location.position().extend(0.0),
+                    scale: location.size().extend(1.0),
+                    ..default()
+                },
+                sprite: Sprite {
+                    color: WALL_COLOR,
+                    ..default()
+                },
+                ..default()
+            },
+            collider: Collider,
+        }
+    }
 }
