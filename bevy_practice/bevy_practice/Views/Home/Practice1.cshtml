@@ -1,0 +1,13 @@
+﻿<html>
+    <body>
+        <!-- wasm -->
+        <script type="module">
+        import wasm_init, { run_bevy_app } from '/wasm/practice1/rust_wasm_lib.js';
+        async function run_bevy_app_init() {
+            await wasm_init();
+            run_bevy_app();
+        }
+        run_bevy_app_init();
+        </script>
+    </body>
+</html>

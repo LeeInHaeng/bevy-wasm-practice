@@ -1,0 +1,13 @@
+bevy_practice/.vs
+bevy_practice/bevy_practice.sln
+bevy_practice/bevy_practice/bin
+bevy_practice/bevy_practice/Controllers
+bevy_practice/bevy_practice/Models
+bevy_practice/bevy_practice/obj
+bevy_practice/bevy_practice/Properties
+bevy_practice/bevy_practice/wwwroot
+bevy_practice/bevy_practice/appsettings.Development.json
+bevy_practice/bevy_practice/appsettings.json
+bevy_practice/bevy_practice/bevy_practice.csproj
+bevy_practice/bevy_practice/bevy_practice.csproj.user
+bevy_practice/bevy_practice/Program.cs
