@@ -54,10 +54,10 @@ pub fn update_enemy_direction(
     let window = window_query.get_single().unwrap();
 
     let half_enemy_size = ENEMY_SIZE / 2.0;
-    let x_min = 0.1 + half_enemy_size;
-    let x_max = window.width() - half_enemy_size - 0.1;
-    let y_min = 0.1 + half_enemy_size;
-    let y_max = window.height() - half_enemy_size - 0.1;
+    let x_min = half_enemy_size;
+    let x_max = window.width() - half_enemy_size;
+    let y_min = half_enemy_size;
+    let y_max = window.height() - half_enemy_size;
 
     for (transform, mut enemy) in enemy_query.iter_mut() {
         let mut direction_change = false;
