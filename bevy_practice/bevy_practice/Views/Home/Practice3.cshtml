@@ -1,0 +1,19 @@
+﻿<html>
+<body>
+    <audio>
+        <source src="~/home/assets/audio/footstep_grass_001.ogg" type="audio/ogg">
+        <source src="~/home/assets/audio/footstep_snow_001.ogg" type="audio/ogg">
+        <source src="~/home/assets/audio/impactBell_heavy_001.ogg" type="audio/ogg">
+        <source src="~/home/assets/audio/impactGlass_light_001.ogg" type="audio/ogg">
+    </audio>
+    <!-- wasm -->
+    <script type="module">
+        import wasm_init, { run_bevy_app } from '/wasm/practice3/bevy_ball_game.js';
+        async function run_bevy_app_init() {
+            await wasm_init();
+            run_bevy_app();
+        }
+        run_bevy_app_init();
+    </script>
+</body>
+</html>
