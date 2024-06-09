@@ -1,10 +1,10 @@
 ﻿<html>
 <body>
     <audio>
-        <source src="~/home/assets/audio/footstep_grass_001.ogg" type="audio/ogg">
-        <source src="~/home/assets/audio/footstep_snow_001.ogg" type="audio/ogg">
-        <source src="~/home/assets/audio/impactBell_heavy_001.ogg" type="audio/ogg">
-        <source src="~/home/assets/audio/impactGlass_light_001.ogg" type="audio/ogg">
+        <source src="~/home/assets/audio/footstep_grass_001.ogg" type="audio/ogg" class="js-audio">
+        <source src="~/home/assets/audio/footstep_snow_001.ogg" type="audio/ogg" class="js-audio">
+        <source src="~/home/assets/audio/impactBell_heavy_001.ogg" type="audio/ogg" class="js-audio">
+        <source src="~/home/assets/audio/impactGlass_light_001.ogg" type="audio/ogg" class="js-audio">
     </audio>
     <!-- wasm -->
     <script type="module">
@@ -13,6 +13,7 @@
             await wasm_init();
             run_bevy_app();
         }
+
         run_bevy_app_init();
     </script>
 </body>

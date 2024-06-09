@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use super::resources::*;
-use crate::events::GameOver;
+use crate::game::components::GameOver;
 
 pub fn update_score(
     score: Res<Score>

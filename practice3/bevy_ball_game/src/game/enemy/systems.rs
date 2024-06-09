@@ -6,10 +6,11 @@ use super::resources::*;
 use super::NUMBER_OF_ENEMIES;
 use super::ENEMY_SPEED;
 use super::ENEMY_SIZE;
-use crate::player::PLAYER_SIZE;
-use crate::player::components::Player;
-use crate::score::resources::Score;
-use crate::events::GameOver;
+use crate::game::player::PLAYER_SIZE;
+use crate::game::player::components::Player;
+use crate::game::score::resources::Score;
+use crate::game::components::GameOver;
+use crate::AppState;
 
 pub fn spawn_enemies(
     mut commands: Commands,
@@ -54,10 +55,10 @@ pub fn update_enemy_direction(
     let window = window_query.get_single().unwrap();
 
     let half_enemy_size = ENEMY_SIZE / 2.0;
-    let x_min = half_enemy_size;
-    let x_max = window.width() - half_enemy_size;
-    let y_min = half_enemy_size;
-    let y_max = window.height() - half_enemy_size;
+    let x_min = half_enemy_size + 0.1;
+    let x_max = window.width() - half_enemy_size - 0.1;
+    let y_min = half_enemy_size + 0.1;
+    let y_max = window.height() - half_enemy_size - 0.1;
 
     for (transform, mut enemy) in enemy_query.iter_mut() {
         let mut direction_change = false;
@@ -177,7 +178,17 @@ pub fn enemy_hit_player(
                 });
                 commands.entity(player_entity).despawn();
                 game_over_event_writer.send(GameOver { score: score.value } );
+                commands.insert_resource(NextState(Some(AppState::GameOver)));
             }
         }
+    }
+}
+
+pub fn despawn_enemies (
+    mut commands: Commands,
+    enemy_query: Query<Entity, With<Enemy>>,
+) {
+    for enemy_entity in enemy_query.iter() {
+        commands.entity(enemy_entity).despawn();
     }
 }

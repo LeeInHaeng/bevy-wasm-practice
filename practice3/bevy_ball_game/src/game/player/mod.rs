@@ -2,6 +2,10 @@ use bevy::prelude::*;
 
 use systems::*;
 
+use crate::AppState;
+
+use super::SimulationState;
+
 pub mod components;
 mod resources;
 mod systems;
@@ -21,7 +25,13 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_player)
             .configure_sets(FixedUpdate, PlayerSystemSet::Movement.before(PlayerSystemSet::Confinement))
-            .add_systems(FixedUpdate, player_movement.in_set(PlayerSystemSet::Movement))
-            .add_systems(FixedUpdate, confine_player_movement.in_set(PlayerSystemSet::Confinement));
+            .add_systems(FixedUpdate, 
+                (
+                    player_movement.in_set(PlayerSystemSet::Movement),
+                    confine_player_movement.in_set(PlayerSystemSet::Confinement)
+                )
+                .run_if(in_state(AppState::Game))
+                .run_if(in_state(SimulationState::Running))
+            );
     }
 }

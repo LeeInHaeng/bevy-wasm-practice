@@ -1,6 +1,6 @@
 use bevy::{app::AppExit, prelude::*, window::PrimaryWindow};
 
-use crate::events::*;
+use crate::{game::components::GameOver, AppState};
 
 pub fn spawn_camera(
     mut commands: Commands,
@@ -33,3 +33,38 @@ pub fn handle_game_over(
     }
 }
 
+pub fn transition_to_game_state (
+    mut commands: Commands,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    app_state: Res<State<AppState>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::KeyG) {
+        match app_state.get() {
+            AppState::Game => {
+
+            },
+            _ => {
+                commands.insert_resource(NextState(Some(AppState::Game)));
+                println!("Entered AppState::Game");
+            }
+        }
+    }
+}
+
+pub fn transition_to_main_menu_state (
+    mut commands: Commands,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    app_state: Res<State<AppState>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::KeyM) {
+        match app_state.get() {
+            AppState::MainMenu => {
+
+            },
+            _ => {
+                commands.insert_resource(NextState(Some(AppState::MainMenu)));
+                println!("Entered AppState::MainMenu");
+            }
+        }
+    }
+}

@@ -3,11 +3,11 @@ use rand::prelude::*;
 
 use super::components::*;
 use super::resources::*;
-use crate::player::components::Player;
-use crate::score::resources::Score;
+use crate::game::player::components::Player;
+use crate::game::score::resources::Score;
 use super::NUMBER_OF_STARS;
-use crate::player::PLAYER_SIZE;
-use crate::star::STAR_SIZE;
+use crate::game::player::PLAYER_SIZE;
+use crate::game::star::STAR_SIZE;
 
 pub fn spawn_stars(
     mut commands: Commands,
