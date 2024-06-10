@@ -1,0 +1,13 @@
+[package]
+name = "third_tutorial"
+version = "0.1.0"
+edition = "2021"
+
+#[lib]
+#crate-type = ["cdylib"]
+
+[dependencies]
+bevy = "0.13.2"
+bevy-inspector-egui = "0.24.0" # wasm unstable
+bevy_third_person_camera = "0.1.10"
+wasm-bindgen = "0.2.92"

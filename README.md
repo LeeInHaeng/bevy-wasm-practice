@@ -13,11 +13,20 @@ practice 3
 `https://www.youtube.com/watch?v=izhFutJiZgo&list=PLVnntJRoP85JHGX7rGDu6LaF3fmDDbqyd&index=2&pp=iAQB`
 
 
+practice 4
+================================
+`https://www.youtube.com/watch?v=pZRzZiJjJ1I&list=PLp0sjyxOq4ATFgiJ4HL8ok9Yp2h7Hz1Fb&index=3`
+
+
 bevy
 ================================
 `cargo add wasm-bindgen`
 
 `cargo add bevy`
+
+`cargo add bevy_third_person_camera`
+
+`cargo add bevy-inspector-egui`
 
 
 WASM Build
@@ -27,3 +36,19 @@ WASM Build
 `cargo build --target wasm32-unknown-unknown --release`
 
 `wasm-bindgen target/wasm32-unknown-unknown/release/{wasm 이름}.wasm --out-dir wasm --target web`
+
+
+
+
+asp.net core 6 cshtml 에서 gltf 확장자 파일 로드 안될때
+================================
+program.cs
+
+```
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".gltf"] = "model/gltf+json";
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
+```
