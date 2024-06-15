@@ -7,6 +7,9 @@ use systems::*;
 
 impl Plugin for CustomWorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_floor);
+        app.add_systems(
+            Startup, 
+            (spawn_floor, spawn_objects)
+        );
     }
 }

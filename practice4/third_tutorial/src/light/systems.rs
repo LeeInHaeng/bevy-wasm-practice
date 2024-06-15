@@ -7,6 +7,7 @@ pub fn spawn_light(
         PointLightBundle {
             point_light: PointLight {
                 intensity: 20000.0,
+                shadows_enabled: true,
                 ..default()
             },
             transform: Transform::from_xyz(0.0, 1.5, 0.0),
