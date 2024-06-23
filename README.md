@@ -18,6 +18,11 @@ practice 4
 `https://www.youtube.com/watch?v=pZRzZiJjJ1I&list=PLp0sjyxOq4ATFgiJ4HL8ok9Yp2h7Hz1Fb&index=3`
 
 
+practice 5
+================================
+`https://youtu.be/_uKWIYEGBjs?si=nuELLbfFGPboClZm`
+
+
 bevy
 ================================
 `cargo add wasm-bindgen`
