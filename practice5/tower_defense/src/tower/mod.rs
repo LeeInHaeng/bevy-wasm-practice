@@ -10,7 +10,8 @@ pub struct CustomTowerPlugin;
 
 impl Plugin for CustomTowerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_tower)
+        app.add_systems(PreStartup, tower_asset_loading)
+            .add_systems(Startup, spawn_tower)
             .register_type::<Tower>()
             .add_systems(Update, 
                 (

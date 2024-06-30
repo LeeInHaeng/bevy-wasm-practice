@@ -1,32 +1,48 @@
 use bevy::{prelude::*, utils::FloatOrd};
+use bevy_mod_picking::PickableBundle;
 use std::time::Duration;
 
 use super::components::*;
 use crate::enemy::components::Enemy;
 use crate::bullet::components::Bullet;
 
+pub fn tower_asset_loading (
+    mut commands: Commands,
+    assets: Res<AssetServer>
+) {
+    commands.insert_resource(TowerAssets {
+        tower_base_scene: assets.load("tower/TowerBase.glb#Scene0"),
+        tomato_tower_scene: assets.load("tower/TomatoTower.glb#Scene0"),
+        tomato_scene: assets.load("tower/Tomato.glb"),
+        tomato_bullet: assets.load("tower/Bullet.glb#Scene0"),
+    });
+}
+
 pub fn spawn_tower (
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    tower_assets: Res<TowerAssets>,
 ) {
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(1.0, 1.0, 1.0)),
-            material: materials.add(Color::rgb(0.67, 0.84, 0.92)),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
+        SpatialBundle::from_transform(Transform::from_xyz(0.0, 0.5, 0.0)),
         Tower { shooting_timer: Timer::new(Duration::from_secs(1), TimerMode::Repeating), bullet_offset: Vec3::new(0.0, 0.2, 0.5) },
-        Name::new("Tower")
-    ));
+        Name::new("Tomato_Tower")
+    ))
+    .with_children(|commands| {
+        commands.spawn(
+            SceneBundle {
+                scene: tower_assets.tomato_tower_scene.clone(),
+                transform: Transform::from_xyz(0.0, -0.8, 0.0),
+                ..default()
+            }
+        );
+    });
 }
 
 pub fn tower_shooting (
     mut commands: Commands,
     mut towers: Query<(Entity, &mut Tower, &GlobalTransform)>,
     enemies: Query<&GlobalTransform, With<Enemy>>,
-    asset_server: Res<AssetServer>,
+    tower_assets: Res<TowerAssets>,
     time: Res<Time>,
 ) {
     for (tower_entity, mut tower, transform) in &mut towers {
@@ -49,7 +65,7 @@ pub fn tower_shooting (
 
                     commands.spawn((
                         SceneBundle {
-                            scene: asset_server.load("tower/Bullet.glb#Scene0"),
+                            scene: tower_assets.tomato_bullet.clone(),
                             transform: Transform::from_translation(tower.bullet_offset),
                             ..default()
                         },

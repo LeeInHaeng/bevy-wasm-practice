@@ -12,4 +12,5 @@ opt-level = 3
 [dependencies]
 bevy = "0.13.2"
 bevy-inspector-egui = "0.24.0"
+bevy_mod_picking = "0.19.1"
 wasm-bindgen = "0.2.92"

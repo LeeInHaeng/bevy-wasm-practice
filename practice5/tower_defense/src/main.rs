@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 mod camera;
+use bevy_mod_picking::*;
 use camera::CustomCameraPlugin;
 
 mod light;
@@ -28,6 +29,7 @@ fn main() {
             CustomTowerPlugin,
             CustomEnemyPlugin,
             CustomBulletPlugin,
+            DefaultPickingPlugins,
         ))
         .run();
 }

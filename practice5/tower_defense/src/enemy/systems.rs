@@ -2,15 +2,22 @@ use bevy::prelude::*;
 
 use super::components::*;
 
+pub fn enemy_asset_loading (
+    mut commands: Commands,
+    assets: Res<AssetServer>
+) {
+    commands.insert_resource(EnemyAssets {
+        enemy_scene: assets.load("enemy/Target.glb#Scene0"),
+    });
+}
+
 pub fn spawn_enemy (
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    enemy_assets: Res<EnemyAssets>,
 ) {
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(0.4, 0.4, 0.4)),
-            material: materials.add(Color::rgb(0.67, 0.84, 0.92)),
+        SceneBundle {
+            scene: enemy_assets.enemy_scene.clone(),
             transform: Transform::from_xyz(-2.0, 0.2, 1.5),
             ..default()
         },
@@ -19,9 +26,8 @@ pub fn spawn_enemy (
     ));
 
     commands.spawn((
-        PbrBundle {
-            mesh: meshes.add(Cuboid::new(0.4, 0.4, 0.4)),
-            material: materials.add(Color::rgb(0.67, 0.84, 0.92)),
+        SceneBundle {
+            scene: enemy_assets.enemy_scene.clone(),
             transform: Transform::from_xyz(-4.0, 0.2, 1.5),
             ..default()
         },

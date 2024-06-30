@@ -12,3 +12,11 @@ pub struct Tower {
 pub struct Lifetime {
     pub timer: Timer,
 }
+
+#[derive(Resource)]
+pub struct TowerAssets {
+    pub tower_base_scene: Handle<Scene>,
+    pub tomato_tower_scene: Handle<Scene>,
+    pub tomato_scene: Handle<Scene>,
+    pub tomato_bullet: Handle<Scene>
+}

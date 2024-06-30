@@ -33,6 +33,8 @@ bevy
 
 `cargo add bevy-inspector-egui`
 
+`cargo add bevy_mod_picking`
+
 
 WASM Build
 ================================
